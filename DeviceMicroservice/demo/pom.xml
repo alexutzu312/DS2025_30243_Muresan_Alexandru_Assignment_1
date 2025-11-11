@@ -42,12 +42,15 @@
 		</dependency>
 
 		<dependency>
+<<<<<<< HEAD
 			<groupId>org.projectlombok</groupId>
 			<artifactId>lombok</artifactId>
 			<optional>true</optional>
 		</dependency>
 
 		<dependency>
+=======
+>>>>>>> e17a6d4c3188685feadbbfdabd3ad1ad4ace9122
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-test</artifactId>
 			<scope>test</scope>

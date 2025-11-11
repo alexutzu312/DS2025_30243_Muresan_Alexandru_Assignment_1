@@ -16,7 +16,10 @@ public interface DeviceRepository extends JpaRepository<Device, UUID> {
      */
     List<Device> findByName(String name);
 
+<<<<<<< HEAD
 
+=======
+>>>>>>> e17a6d4c3188685feadbbfdabd3ad1ad4ace9122
     /**
      * Example: Custom query
      */
@@ -26,4 +29,8 @@ public interface DeviceRepository extends JpaRepository<Device, UUID> {
             "AND p.maxConsumption >= 60  ")
     Optional<Device> findSomething(@Param("name") String name);
 
+<<<<<<< HEAD
 }
+=======
+}
+>>>>>>> e17a6d4c3188685feadbbfdabd3ad1ad4ace9122

@@ -7,12 +7,18 @@ import com.example.demo.dtos.builders.EnergyUserBuilder;
 import com.example.demo.entities.EnergyUser;
 import com.example.demo.handlers.exceptions.model.ResourceNotFoundException;
 import com.example.demo.repositories.EnergyUserRepository;
+<<<<<<< HEAD
 import jakarta.transaction.Transactional;
+=======
+>>>>>>> e17a6d4c3188685feadbbfdabd3ad1ad4ace9122
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+<<<<<<< HEAD
 import org.springframework.web.client.RestTemplate;
+=======
+>>>>>>> e17a6d4c3188685feadbbfdabd3ad1ad4ace9122
 
 import java.util.List;
 import java.util.Optional;
@@ -25,14 +31,18 @@ public class EnergyUserService {
     private final EnergyUserRepository energyUserRepository;
 
     @Autowired
+<<<<<<< HEAD
     private RestTemplate restTemplate;
 
 
     @Autowired
+=======
+>>>>>>> e17a6d4c3188685feadbbfdabd3ad1ad4ace9122
     public EnergyUserService(EnergyUserRepository energyUserRepository) {
         this.energyUserRepository = energyUserRepository;
     }
 
+<<<<<<< HEAD
 
     @Transactional
     public EnergyUser deleteEnergyUser(UUID energyUserId)
@@ -81,6 +91,8 @@ public class EnergyUserService {
     }
 
 
+=======
+>>>>>>> e17a6d4c3188685feadbbfdabd3ad1ad4ace9122
     public List<EnergyUserDTO> findEnergyUser() {
         List<EnergyUser> energyUserList = energyUserRepository.findAll();
         return energyUserList.stream()
@@ -97,8 +109,11 @@ public class EnergyUserService {
         return EnergyUserBuilder.toEnergyUserDetailsDTO(prosumerOptional.get());
     }
 
+<<<<<<< HEAD
 
     @Transactional
+=======
+>>>>>>> e17a6d4c3188685feadbbfdabd3ad1ad4ace9122
     public UUID insert(EnergyUserDetailsDTO UserDTO) {
         EnergyUser energyUser = EnergyUserBuilder.toEntity(UserDTO);
         energyUser = energyUserRepository.save(energyUser);

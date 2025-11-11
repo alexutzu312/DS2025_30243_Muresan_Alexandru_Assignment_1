@@ -84,6 +84,7 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
         return handleExceptionInternal(ex, body, headers, httpStatus, request);
     }
 
+<<<<<<< HEAD
 
     @Override // <-- Adaugă @Override
     @SuppressWarnings("deprecated")
@@ -93,10 +94,15 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
             HttpStatusCode status, // <-- Parametru nou
             WebRequest request) {
 
+=======
+    @ExceptionHandler(BindException.class)
+    public ResponseEntity<Object> handleBindException(BindException ex, WebRequest request) {
+>>>>>>> e17a6d4c3188685feadbbfdabd3ad1ad4ace9122
         var details = ex.getBindingResult().getFieldErrors().stream()
                 .map(fe -> fe.getField() + ": " + fe.getDefaultMessage())
                 .toList();
 
+<<<<<<< HEAD
         // Folosim statusul primit de la clasa părinte (convertit în HttpStatus)
         HttpStatus httpStatus = HttpStatus.valueOf(status.value());
 
@@ -104,13 +110,24 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
                 "Binding failed",
                 httpStatus.getReasonPhrase(),
                 httpStatus.value(),
+=======
+        var status = HttpStatus.BAD_REQUEST;
+        var body = new ExceptionHandlerResponseDTO(
+                "Binding failed",
+                status.getReasonPhrase(),
+                status.value(),
+>>>>>>> e17a6d4c3188685feadbbfdabd3ad1ad4ace9122
                 BindException.class.getSimpleName(),
                 details,
                 request.getDescription(false)
         );
 
+<<<<<<< HEAD
         // Folosim headerele și httpStatus-ul primite ca argumente
         return handleExceptionInternal(ex, body, headers, httpStatus, request);
+=======
+        return handleExceptionInternal(ex, body, new HttpHeaders(), status, request);
+>>>>>>> e17a6d4c3188685feadbbfdabd3ad1ad4ace9122
     }
 
     @Override

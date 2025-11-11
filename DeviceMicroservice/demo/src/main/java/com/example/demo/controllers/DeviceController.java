@@ -2,12 +2,17 @@ package com.example.demo.controllers;
 
 import com.example.demo.dtos.DeviceDTO;
 import com.example.demo.dtos.DeviceDetailsDTO;
+<<<<<<< HEAD
 import com.example.demo.dtos.UserReferenceDTO;
 import com.example.demo.entities.Device;
 import com.example.demo.services.DeviceService;
 import com.example.demo.services.UserReferenceService;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
+=======
+import com.example.demo.services.DeviceService;
+import jakarta.validation.Valid;
+>>>>>>> e17a6d4c3188685feadbbfdabd3ad1ad4ace9122
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -18,6 +23,7 @@ import java.util.List;
 import java.util.UUID;
 
 @RestController
+<<<<<<< HEAD
 @RequestMapping("/devices")
 @CrossOrigin
 public class DeviceController {
@@ -53,11 +59,32 @@ public class DeviceController {
     @PostMapping
     public ResponseEntity<Void> create(@Valid @RequestBody DeviceDetailsDTO device) {
         UUID id = deviceService.insert(device);
+=======
+@RequestMapping("/people")
+@Validated
+public class DeviceController {
+
+    private final DeviceService deviceService;
+
+    public DeviceController(DeviceService deviceService) {
+        this.deviceService = deviceService;
+    }
+
+    @GetMapping
+    public ResponseEntity<List<DeviceDTO>> getPeople() {
+        return ResponseEntity.ok(deviceService.findDevice());
+    }
+
+    @PostMapping
+    public ResponseEntity<Void> create(@Valid @RequestBody DeviceDetailsDTO person) {
+        UUID id = deviceService.insert(person);
+>>>>>>> e17a6d4c3188685feadbbfdabd3ad1ad4ace9122
         URI location = ServletUriComponentsBuilder
                 .fromCurrentRequest()
                 .path("/{id}")
                 .buildAndExpand(id)
                 .toUri();
+<<<<<<< HEAD
         return ResponseEntity.created(location).build(); // 201
     }
 
@@ -88,3 +115,13 @@ public class DeviceController {
 
 
 }
+=======
+        return ResponseEntity.created(location).build(); // 201 + Location header
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<DeviceDetailsDTO> getPerson(@PathVariable UUID id) {
+        return ResponseEntity.ok(deviceService.findDeviceById(id));
+    }
+}
+>>>>>>> e17a6d4c3188685feadbbfdabd3ad1ad4ace9122
