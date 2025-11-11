@@ -1,0 +1,140 @@
+version: '3.8'
+
+networks:
+  shared-network:
+    driver: bridge
+  traefik-network:
+    driver: bridge
+
+services:
+  device-db:
+    image: postgres:16
+    container_name: device-db
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: root
+      POSTGRES_DB: device-db
+    volumes:
+      - "./Databases/devicedb:/var/lib/postgresql/data"
+    ports:
+      - "5434:5432" 
+    networks:
+      - shared-network
+
+  # 2. User Database
+  user-db:
+    image: postgres:16
+    container_name: user-db
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: root
+      POSTGRES_DB: user-db
+    volumes:
+      - "./Databases/userdb:/var/lib/postgresql/data"
+    ports:
+      - "5433:5432" 
+    networks:
+      - shared-network
+  traefik:
+    image: traefik:v2.10
+    container_name: traefik
+    command:
+      - "--api.dashboard=true"
+      - "--providers.docker=true"
+      - "--providers.docker.exposedbydefault=false"
+
+      # EntryPoint Web
+      - "--entrypoints.web.address=:80"
+
+      # Middleware ForwardAuth -> calls auth-service /validate-token
+      - "--entrypoints.web.http.middlewares.auth.forwardauth.address=http://auth-service:8083/validate-token"
+      - "--entrypoints.web.http.middlewares.auth.forwardauth.trustForwardHeader=true"
+      - "--entrypoints.web.http.middlewares.auth.forwardauth.authResponseHeaders=X-User-ID,X-User-Role"
+    ports:
+      - "80:80"
+      - "8080:8080"   # Traefik Dashboard
+    networks:
+      - traefik-network
+      - shared-network
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+
+  auth-service:
+    build:
+      context: ./AuthenticationService/demo
+      dockerfile: Dockerfile
+    environment:
+      - DB_IP=user-db
+      - DB_PORT=5432
+      - DB_USER=postgres
+      - DB_PASSWORD=root
+      - DB_DBNAME=user-db
+      - DEVICE_MICROSERVICE_URL=http://device-service:8082
+      - jwt.expirationMs=86400000
+      - jwt.secret=SECRETKEYSECRETKEYSECRETKEYSECRETKEYSECRETKEYSECRETKEYSECRETKEYSECRETKEYSECRETKEYSECRETKEYSECRETKEYSECRETKEYSECRETKEYSECRETKEYSECRETKEYSECRETKEYSECRETKEYSECRETKEYSECRETKEYSECRETKEYSECRETKEYSECRETKEYSECRETKEYSECRETKEYSECRETKEYSECRETKEYSECRETKEYSECRETKEYSECRETKEYSECRETKEYSECRETKEYSECRETKEYSECRETKEYSECRETKEYSECRETKEYSECRETKEYSECRETKEYSECRETKEYSECRETKEYSECRETKEYSECRETKEYSECRETKEY
+
+    labels:
+      - "traefik.enable=true"
+
+      # ROUTER (path-based)
+      - "traefik.http.routers.auth.rule=PathPrefix(`/auth`)"
+      - "traefik.http.routers.auth.entrypoints=web"
+
+      # REMOVE auth middleware for excluded paths
+      - "traefik.http.routers.auth.middlewares=auth-exceptions"
+
+      # EXCEPTION MIDDLEWARE (regex)
+      - "traefik.http.middlewares.auth-exceptions.chain.middlewares=auth-allow,auth-required"
+
+      - "traefik.http.middlewares.auth-allow.redirectregex.regex=^/auth/(login|register|validate-token)"
+      - "traefik.http.middlewares.auth-allow.redirectregex.replacement=$$0"
+      - "traefik.http.middlewares.auth-allow.redirectregex.permanent=false"
+
+      # DEFAULT: all other endpoints require authentication
+      - "traefik.http.middlewares.auth-required.forwardauth.address=http://auth-service:8083/validate-token"
+
+    networks:
+      - shared-network
+      - traefik-network
+
+  user-service:
+    build:
+      context: ./UserMicroservice/demo
+      dockerfile: Dockerfile
+    environment:
+      - DB_IP=user-db
+      - DB_PORT=5432
+      - DB_USER=postgres
+      - DB_PASSWORD=root
+      - DB_DBNAME=user-db
+      - DEVICE_MICROSERVICE_URL=http://device-service:8082
+
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.user.rule=PathPrefix(`/user`)"
+      - "traefik.http.routers.user.entrypoints=web"
+      - "traefik.http.routers.user.middlewares=auth@docker"
+
+    networks:
+      - shared-network
+      - traefik-network
+
+  frontend:
+    build:
+      context: ./frontend/frontend
+      dockerfile: Dockerfile
+      args:
+        REACT_APP_DEVICE_API_GATEWAY_URL: http://localhost:8081/device
+        REACT_APP_USER_API_GATEWAY_URL: http://localhost:8081/user
+        REACT_APP_AUTH_API_GATEWAY_URL: http://localhost:8081/auth
+    ports:
+      - "3000:80"
+    networks:
+      - shared-network
+      - traefik-network
+
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.frontend.rule=PathPrefix(`/`)"
+      - "traefik.http.routers.frontend.entrypoints=web"
+
